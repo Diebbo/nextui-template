@@ -6,13 +6,13 @@ export function middleware(request: NextRequest) {
 
   if (
     (pathname === "/login" || pathname === "/register") &&
-    request.cookies.has("userAuth")
+    request.cookies.has("token")
   )
     return NextResponse.redirect(new URL("/", request.url));
 
   if (
     (pathname === "/" || pathname === "/accounts") &&
-    !request.cookies.has("userAuth")
+    !request.cookies.has("token")
   )
     return NextResponse.redirect(new URL("/login", request.url));
 
