@@ -8,21 +8,29 @@ import { Formik } from "formik";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { login } from "@/actions/auth.action";
+import { useState } from "react";
 
 export const Login = () => {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const initialValues: LoginFormType = {
-    email: "admin@acme.com",
-    password: "admin",
+    email: "user@gmail.com",
+    password: "123456",
   };
 
   const handleLogin = useCallback(
     async (values: LoginFormType) => {
-      // `values` contains email & password. You can use provider to connect user
+      try {
+        const response = await login(values);
 
-      await createAuthCookie();
-      router.replace("/");
+        await createAuthCookie(response.token);
+        router.replace("/");
+      } catch (err: any) {
+        console.error(error);
+        setError(err.message ? err.message.toString() : "An unknown error occurred");
+      }
     },
     [router]
   );
@@ -68,10 +76,22 @@ export const Login = () => {
         )}
       </Formik>
 
+      {error && (
+        <div className='font-bold text-slate-400 mt-4 text-sm text-red-500'>
+          {error}
+        </div>
+      )}
+
       <div className='font-light text-slate-400 mt-4 text-sm'>
         Don&apos;t have an account ?{" "}
         <Link href='/register' className='font-bold'>
           Register here
+        </Link>
+      </div>
+
+      <div className='font-light text-slate-400 mt-4 text-sm'>
+        <Link href='/forgot-password' className='font-bold'>
+          Forgot password ?
         </Link>
       </div>
     </>
