@@ -2,7 +2,7 @@
 
 import { createAuthCookie, register } from "@/actions/auth.action";
 import { RegisterSchema } from "@/helpers/schemas";
-import { RegisterFormType } from "@/helpers/types";
+import { RegisterFormType, RegisterType } from "@/helpers/types";
 import { Button, Input } from "@nextui-org/react";
 import { Formik } from "formik";
 import Link from "next/link";
@@ -36,15 +36,14 @@ export const Register = () => {
   const handleRegister = useCallback(
     async (values: RegisterFormType) => {
       try {
-        const response = await register(values);
+        const response = await register(values as RegisterType);
         await createAuthCookie(response.token);
         router.replace("/");
-      } catch (err: any) {
-        console.error(err);
-        setError(err?.message.toString());
+      } catch (err: Error | any) {
+        setError(err?.response?.data?.message || err.message);
       }
     },
-    [router]
+    [router],
   );
 
   const handleNextStep = () => {
@@ -137,9 +136,9 @@ export const Register = () => {
                   variant="bordered"
                   label="Birth Date"
                   type="date"
-                  value={values.birthDate.toISOString().substr(0, 10)}
+                  value={values.birthDate.toString()}
                   isInvalid={!!errors.birthDate && !!touched.birthDate}
-                  errorMessage={errors.birthDate?.toDateString()}
+                  errorMessage={errors.birthDate}
                   onChange={handleChange("birthDate")}
                 />
                 <Input
@@ -199,6 +198,11 @@ export const Register = () => {
               </div>
             )}
 
+            {error && (
+              <div className="font-bold text-slate-400 mt-4 text-sm text-red-500">
+                {error}
+              </div>
+            )}
             <div className="flex flex-row gap-4">
               <Button
                 onPress={handlePrevStep}
@@ -217,11 +221,7 @@ export const Register = () => {
                   Register
                 </Button>
               ) : (
-                <Button
-                  onPress={handleNextStep}
-                  variant="flat"
-                  color="primary"
-                >
+                <Button onPress={handleNextStep} variant="flat" color="primary">
                   Next
                 </Button>
               )}
@@ -236,12 +236,6 @@ export const Register = () => {
           Login here
         </Link>
       </div>
-
-      {error && (
-        <div className="font-light text-slate-400 mt-4 text-sm text-red-500">
-          {error}
-        </div>
-      )}
     </>
   );
 };
