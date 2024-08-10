@@ -14,10 +14,25 @@ function parseParticipants(participants: People) {
   return participantsNames;
 }
 
-export const EventCard = (props: { data: SelfieEvent }) => {
+interface EventCardTheme {
+  bg: string;
+  text: string;
+}
+
+var themes: EventCardTheme[] = [
+  { bg: "bg-primary", text: "text-white" },
+  { bg: "bg-default-50", text: "text-black" },
+  { bg: "bg-default-100", text: "text-black" },
+  { bg: "bg-success", text: "text-white" },
+  { bg: "bg-danger", text: "text-white" },
+  { bg: "bg-warning", text: "text-danger" },
+];
+
+export const EventCard = (props: {data:SelfieEvent, theme:number}) => {
   const data = props.data;
+  const theme = themes[props.theme];
   return (
-    <Card className="xl:max-w-sm bg-primary rounded-xl shadow-md px-3 w-full">
+    <Card className={`xl:max-w-sm rounded-xl shadow-md px-3 w-full ${theme.bg}`}>
       <CardBody className="py-5 overflow-hidden">
         <div className="flex gap-2.5">
           <Community />
@@ -32,14 +47,14 @@ export const EventCard = (props: { data: SelfieEvent }) => {
         <div className="flex items-center gap-6">
           <div>
             <div>
-              <span className="font-semibold text-success text-xs mr-1">from</span>
+              <span className={`font-semibold text-xs mr-1 ${theme.text}`}>from</span>
               <span className="text-s text-white">{data.dateFrom.toLocaleDateString()} {data.dateFrom.toLocaleTimeString()}</span>
             </div>
           </div>
 
           <div>
             <div>
-              <span className="font-semibold text-warning text-xs mr-1">to</span>
+              <span className={`font-semibold text-xs mr-1 ${theme.text}`}>to</span>
               <span className="text-s text-white">{data.dateTo.toLocaleDateString()} {data.dateTo.toLocaleTimeString()}</span>
             </div>
           </div>
